@@ -6,3 +6,5 @@ shap
 matplotlib
 ipython
 bcrypt
+gunicorn
+
