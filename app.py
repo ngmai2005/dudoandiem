@@ -15,6 +15,10 @@ if "logged_in" not in st.session_state:
 if "view_history" not in st.session_state:
     st.session_state.view_history = False
 
+# Khởi tạo role mặc định nếu chưa có
+if "role" not in st.session_state:
+    st.session_state.role = "user"
+
 # --- Phần đăng nhập / đăng ký (thay thế phần cũ) ---
 if not st.session_state.logged_in:
 
@@ -36,7 +40,6 @@ if not st.session_state.logged_in:
             else:
                 st.error(msg)
 
-
     else:  # Đăng ký
         # Cho phép admin tạo tài khoản admin nếu đang đăng ký bằng admin (ở đây mặc định role=user)
         role_choice = st.selectbox("Chọn role (chỉ dùng nếu bạn có quyền admin để tạo admin)", ["user", "admin"])
@@ -48,9 +51,6 @@ if not st.session_state.logged_in:
                 st.error(msg)
 
     st.stop()   # NGĂN KHÔNG CHO CHẠY QUA TRANG DỰ ĐOÁN
-
-
-
 
 
 # Hàm dự đoán điểm
@@ -114,7 +114,7 @@ with open("model.pkl", "rb") as f:
 
         from auth import get_all_users, delete_user, reset_password
 
-    # Xem danh sách users
+        # Xem danh sách users
         if admin_page == "Xem Users":
             users = get_all_users()
             import pandas as pd
@@ -122,7 +122,7 @@ with open("model.pkl", "rb") as f:
             st.subheader("Danh sách tài khoản")
             st.dataframe(df)
 
-    # Xóa user
+        # Xóa user
         elif admin_page == "Xóa User":
             username_del = st.text_input("Nhập username cần xóa:")
             if st.button("Xóa"):
@@ -132,7 +132,7 @@ with open("model.pkl", "rb") as f:
                     delete_user(username_del)
                     st.success("Đã xóa!")
 
-    # Reset password
+        # Reset password
         elif admin_page == "Reset Password":
             username_reset = st.text_input("Username cần reset:")
             new_pass = st.text_input("Mật khẩu mới:")
@@ -172,7 +172,6 @@ if st.session_state.view_history:
     st.stop()
 
 
-
 st.write(
     "Dự đoán điểm thi dựa trên **số giờ học**, "
     "**điểm bài tập trên lớp**, và **điểm bài tập về nhà**."
@@ -196,9 +195,8 @@ if st.button("Dự đoán điểm thi"):
         classwork,
         homework,
         predicted_score
-)
+    )
 
-    
     shap_values, base_value = get_shap_info(model, user_input)
     display_shap(shap_values, base_value, user_input, feature_names)
 
@@ -214,4 +212,3 @@ if "logged_in" in st.session_state and st.session_state["logged_in"]:
         for key in list(st.session_state.keys()):
             del st.session_state[key]
         st.rerun()
-
